@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 from datetime import datetime
+import psycopg2
 
 # Step 1: Load player career summary
 latest_summary_file = sorted(os.listdir('output'), reverse=True)
@@ -12,7 +13,7 @@ for file in latest_summary_file:
         break
 
 if summary_file is None:
-    raise FileNotFoundError("❌ No player career summary file found in output/ folder!")
+    raise FileNotFoundError("No player career summary file found in output/ folder!")
 
 player_stats = pd.read_csv(summary_file)
 
@@ -44,13 +45,82 @@ filename = f"output/Best_BASRA_Leaderboard_{timestamp}.csv"
 
 player_stats.to_csv(filename, index=False)
 
-print(f"\n✅ BASRA leaderboard saved to '{filename}'")
+print(f"\n BASRA leaderboard saved to '{filename}'")
 
 # Step 9: Show top 5 players
-print("\n✅ Top 5 players by BASRA:")
+print("\n Top 5 players by BASRA:")
 print(player_stats.head(5))
 
 # Step 10: Show number of records and time
 now = datetime.now()
 current_time = now.strftime("%I:%M %p")
-print(f"\n✅ Saved {len(player_stats)} records at {current_time} ✅")
+print(f"\n Saved {len(player_stats)} records at {current_time}")
+
+# -------------------------
+# Step 11: Load into PostgreSQL
+# -------------------------
+
+# Connect to PostgreSQL
+conn = psycopg2.connect(
+    dbname="cricket_data",
+    user="postgres",
+    password="root1234",
+    host="localhost",
+    port="5432"
+)
+cursor = conn.cursor()
+
+# Create table if not exists
+create_table_query = """
+CREATE TABLE IF NOT EXISTS best_basra_leaderboard (
+    batsman TEXT PRIMARY KEY,
+    batsman_runs INTEGER,
+    average FLOAT,
+    strike_rate FLOAT,
+    best_score INTEGER,
+    basra FLOAT,
+    report_date DATE
+);
+"""
+cursor.execute(create_table_query)
+conn.commit()
+
+# 🚀 Insert or Update records (UPSERT)
+for idx, row in player_stats.iterrows():
+    insert_query = """
+    INSERT INTO best_basra_leaderboard (batsman, batsman_runs, average, strike_rate, best_score, basra, report_date)
+    VALUES (%s, %s, %s, %s, %s, %s, %s)
+    ON CONFLICT (batsman)
+    DO UPDATE SET
+        batsman_runs = EXCLUDED.batsman_runs,
+        average = EXCLUDED.average,
+        strike_rate = EXCLUDED.strike_rate,
+        best_score = EXCLUDED.best_score,
+        basra = EXCLUDED.basra,
+        report_date = EXCLUDED.report_date;
+    """
+    data = (
+        row['batsman'],
+        row['batsman_runs'],
+        row['average'],
+        row['strike_rate'],
+        row['best_score'],
+        row['basra'],
+        row['report_date']
+    )
+    cursor.execute(insert_query, data)
+
+conn.commit()
+
+# Verify a sample
+cursor.execute("SELECT * FROM best_basra_leaderboard LIMIT 5;")
+sample_rows = cursor.fetchall()
+print("\n Sample data from best_basra_leaderboard table:")
+for r in sample_rows:
+    print(r)
+
+# Close connection
+cursor.close()
+conn.close()
+
+print("\n🏆 All Done Successfully!")

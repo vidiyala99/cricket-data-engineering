@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 from datetime import datetime
+import psycopg2
 
 # Step 1: Generate timestamp (date + time for uniqueness)
 timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
@@ -50,17 +51,70 @@ final_batsman_stats = final_batsman_stats.reset_index(drop=True)
 final_batsman_stats.index = range(1, len(final_batsman_stats) + 1)
 
 # Step 8: Save results
-# Ensure output folder exists
 os.makedirs("output", exist_ok=True)
-
 filename = f"output/batsman_statistics_{timestamp}.csv"
 final_batsman_stats.to_csv(filename, index=False)
 
-print(f"\n Batsman statistics saved to '{filename}'")
+print(f"\n✅ Batsman statistics saved to '{filename}'")
 
 # Step 9: Read back and show a small sample
 saved_df = pd.read_csv(filename)
-print("\n Sample data from saved CSV:")
+print("\n✅ Sample data from saved CSV:")
 print(saved_df.head(5))
 
-#print("\n All Done Successfully!")
+# -------------------------
+# Step 10: Load into PostgreSQL with UPSERT
+# -------------------------
+
+# Connect to PostgreSQL
+conn = psycopg2.connect(
+    dbname="cricket_data",
+    user="postgres",
+    password="root1234",
+    host="localhost",
+    port="5432"
+)
+cursor = conn.cursor()
+
+# Create table if not exists
+create_table_query = """
+CREATE TABLE IF NOT EXISTS player_career_summary (
+    batsman TEXT PRIMARY KEY,
+    batsman_runs INTEGER,
+    average FLOAT,
+    strike_rate FLOAT,
+    best_score INTEGER
+);
+"""
+cursor.execute(create_table_query)
+conn.commit()
+
+# 🚀 Insert or Update records (UPSERT)
+for idx, row in final_batsman_stats.iterrows():
+    insert_query = """
+    INSERT INTO player_career_summary (batsman, batsman_runs, average, strike_rate, best_score)
+    VALUES (%s, %s, %s, %s, %s)
+    ON CONFLICT (batsman)
+    DO UPDATE SET
+        batsman_runs = EXCLUDED.batsman_runs,
+        average = EXCLUDED.average,
+        strike_rate = EXCLUDED.strike_rate,
+        best_score = EXCLUDED.best_score;
+    """
+    data = (row['batsman'], row['batsman_runs'], row['average'], row['strike_rate'], row['best_score'])
+    cursor.execute(insert_query, data)
+
+conn.commit()
+
+# Verify with a sample
+cursor.execute("SELECT * FROM player_career_summary LIMIT 5;")
+sample_rows = cursor.fetchall()
+print("\n Sample data from player_career_summary table:")
+for r in sample_rows:
+    print(r)
+
+# Close connection
+cursor.close()
+conn.close()
+
+print("\n All Done Successfully!")
