@@ -20,7 +20,9 @@ matches['date'] = pd.to_datetime(matches['date'], dayfirst=True, errors='coerce'
 
 # Step 4: Create matches table if not exists
 create_matches_table_query = """
-CREATE TABLE IF NOT EXISTS matches (
+DROP TABLE IF EXISTS matches CASCADE;
+
+CREATE TABLE matches (
     id INTEGER PRIMARY KEY,
     season INTEGER,
     city TEXT,
@@ -38,7 +40,7 @@ CREATE TABLE IF NOT EXISTS matches (
     venue TEXT,
     umpire1 TEXT,
     umpire2 TEXT,
-    umpire3 TEXT
+    umpire3 TEXT  -- ← Must be included
 );
 """
 cursor.execute(create_matches_table_query)
