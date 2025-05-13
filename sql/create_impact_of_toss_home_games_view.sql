@@ -16,15 +16,16 @@ WITH toss_analysis AS (
     FROM
         matches
     WHERE
-        result != 'no result'
+        result IS NOT NULL 
+        AND result != 'no result'
 )
 SELECT
     home_team_won_toss,
     COUNT(*) AS total_matches,
     SUM(CASE WHEN home_team_won_match THEN 1 ELSE 0 END) AS matches_won,
     SUM(CASE WHEN NOT home_team_won_match THEN 1 ELSE 0 END) AS matches_lost,
-    ROUND(100.0 * SUM(CASE WHEN home_team_won_match THEN 1 ELSE 0 END) / COUNT(*), 2) AS win_percentage,
-    ROUND(100.0 * SUM(CASE WHEN NOT home_team_won_match THEN 1 ELSE 0 END) / COUNT(*), 2) AS loss_percentage
+    ROUND(100.0 * SUM(CASE WHEN home_team_won_match THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0), 2) AS win_percentage,
+    ROUND(100.0 * SUM(CASE WHEN NOT home_team_won_match THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0), 2) AS loss_percentage
 FROM
     toss_analysis
 GROUP BY

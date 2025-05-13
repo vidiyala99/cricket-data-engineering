@@ -2,17 +2,21 @@ DROP VIEW IF EXISTS top_death_batters;
 CREATE OR REPLACE VIEW top_death_batters AS
 WITH death_stats AS (
     SELECT
-        m.season,
-        d.batsman,
-        COUNT(*) FILTER (WHERE d.wide_runs = 0) AS balls_faced,
-        SUM(d.batsman_runs) AS runs_scored
-    FROM deliveries d
-    JOIN matches m ON d.match_id = m.id
-    WHERE d.over BETWEEN 16 AND 20
-    GROUP BY m.season, d.batsman
+        season,
+        batsman,
+        COUNT(*) - COUNT(CASE WHEN wide_runs > 0 THEN 1 END) AS balls_faced,
+        SUM(batsman_runs) AS runs_scored
+    FROM 
+        deliveries_updated
+    WHERE 
+        over BETWEEN 16 AND 20
+    GROUP BY 
+        season, batsman
 ),
 season_filtered AS (
-    SELECT * FROM death_stats WHERE runs_scored >= 250
+    SELECT * 
+    FROM death_stats 
+    WHERE runs_scored >= 250
 ),
 overall_totals AS (
     SELECT
@@ -31,7 +35,7 @@ combined AS (
         runs_scored
     FROM season_filtered
 
-    UNION
+    UNION ALL
 
     SELECT
         'All-Time' AS season,
@@ -47,4 +51,5 @@ SELECT
     runs_scored,
     ROUND(runs_scored * 100.0 / NULLIF(balls_faced, 0), 2) AS strike_rate
 FROM combined
-ORDER BY season ASC, strike_rate DESC;
+ORDER BY 
+    season ASC, strike_rate DESC;
