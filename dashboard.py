@@ -11,19 +11,15 @@ st.title("🏏 Cricket Analytics Dashboard")
 def load_latest_csv(pattern):
     files = sorted(glob.glob(os.path.join("output", f"{pattern}*.csv")), reverse=True)
     if files:
-        st.write(f"✅ Loaded: {files[0]}")
         return pd.read_csv(files[0])
     else:
-        st.warning(f"⚠️ No file found for pattern: {pattern}")
         return pd.DataFrame()
-
 
 def find_column(df, target):
     for col in df.columns:
         if col.strip().lower() == target.strip().lower():
             return col
     return None
-
 
 def render_df(df, label="data"):
     df_display = df.copy()
@@ -32,7 +28,7 @@ def render_df(df, label="data"):
     st.download_button(f"⬇️ Download {label}", df.to_csv(index=False), f"{label}.csv", "text/csv")
 
 # === Load All Data ===
-basra_df = load_latest_csv("Best_BASRA_Leaderboard")
+basra_df = load_latest_csv("BASRA_Leaderboard_With_Teams")
 batters_df = load_latest_csv("Top_Batters_350runs_130sr")
 batters_filtered_df = load_latest_csv("top_batters_filtered")
 bowlers_df = load_latest_csv("Top_Bowlers_10wickets_Economy")
@@ -62,8 +58,21 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
 
 # === Top Batters Tab ===
 with tab1:
-    st.subheader("🔥 Top Batters by BASRA")
-    render_df(basra_df, "Top_BASRA")
+    st.subheader("🔥 Top Batters by BASRA (with Team)")
+
+    if not basra_df.empty:
+        # Optional team filter
+        teams = basra_df['team'].dropna().unique()
+        selected_team = st.selectbox("🔍 Filter by Team", options=["All"] + sorted(teams.tolist()))
+
+        if selected_team != "All":
+            filtered_basra_df = basra_df[basra_df['team'] == selected_team]
+        else:
+            filtered_basra_df = basra_df
+
+        render_df(filtered_basra_df, "Top_BASRA_With_Teams")
+    else:
+        st.warning("No BASRA leaderboard with team data available.")
 
 # === Death Overs Analysis ===
 with tab2:
