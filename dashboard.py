@@ -47,13 +47,14 @@ batter_performance_by_team_df = load_latest_csv("batter_performance_by_team")
 batter_performance_against_team_df = load_latest_csv("batter_performance_against_team")
 
 # === Tabs Layout ===
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
     "🏅 BASRA & Top Batters",
     "💀 Death Overs Analysis",
     "⚡ Powerplay Analysis",
     "📊 Team-Level Metrics",
     "🔁 All-Rounders & Raw Stats",
-    "🎯 Performance Insights"
+    "🎯 Performance Insights",
+    "🔮 Match Outcome Prediction"
 ])
 
 # === Top Batters Tab ===
@@ -110,3 +111,97 @@ with tab6:
 
     st.subheader("🎯 Batter Performance Against Team")
     render_df(batter_performance_against_team_df, "Batter_Performance_Against_Team")
+# === Match Outcome Prediction ===
+#tab7 = st.tabs(["🔮 Match Outcome Prediction"])[0]
+
+# === Match Outcome Prediction ===
+# === Match Outcome Prediction ===
+with tab7:
+    st.subheader("🔮 Predict Match Outcome")
+
+    # === Load Match History and Venue Data ===
+    from etl.data_cleaning import clean_matches
+    from etl.data_cleaning import clean_matches, clean_venue_names
+
+    matches_path = "data/raw/matches_extracted.csv"
+    try:
+        matches_df = pd.read_csv(matches_path)                
+        matches_df = clean_matches(matches_df)
+        venue_df = clean_venue_names(venue_df)
+    except Exception as e:
+        st.error(f"❌ Failed to load or clean match data: {e}")
+        st.stop()
+
+    if matches_df.empty:
+        st.error("❌ Match data is empty. Please check the CSV file.")
+        st.stop()
+
+    # === Build Dropdowns ===
+    teams = sorted(set(basra_df['team'].dropna().unique()))
+    venues = sorted(set(venue_df['venue'].dropna().unique())) if 'venue' in venue_df.columns else []
+
+    col1, col2 = st.columns(2)
+    with col1:
+        team1 = st.selectbox("🏏 Team 1", options=teams)
+    with col2:
+        team2 = st.selectbox("🏏 Team 2", options=[t for t in teams if t != team1])
+
+    toss_winner = st.selectbox("🎲 Toss Winner", options=[team1, team2])
+    toss_decision = st.selectbox("🧭 Toss Decision", options=["bat", "field"])
+    venue = st.selectbox("📍 Venue", options=venues)
+
+    # === Feature Functions ===
+    def get_recent_form(team_name, df, n=5):
+        recent_matches = df[
+            (df["team1"] == team_name) | (df["team2"] == team_name)
+        ].sort_values("date", ascending=False).head(n)
+        return recent_matches[recent_matches["winner"] == team_name].shape[0]
+
+    def get_team_strength(team_name, df, n=10):
+        recent_matches = df[
+            (df["team1"] == team_name) | (df["team2"] == team_name)
+        ].sort_values("date", ascending=False).head(n)
+        wins = recent_matches[recent_matches["winner"] == team_name].shape[0]
+        return wins / n if n > 0 else 0.5
+
+    def get_venue_win_rate(team_name, venue, venue_df):
+        row = venue_df[
+            (venue_df["team"] == team_name) & (venue_df["venue"] == venue)
+        ]
+        if not row.empty and "win_percentage" in row.columns:
+            return row["win_percentage"].values[0]
+        return 0.5  # fallback if no data
+
+    # === Compute Features ===
+    recent_form_team1 = get_recent_form(team1, matches_df)
+    recent_form_team2 = get_recent_form(team2, matches_df)
+    team1_strength = get_team_strength(team1, matches_df)
+    team2_strength = get_team_strength(team2, matches_df)
+    venue_win_rate_team1 = get_venue_win_rate(team1, venue, venue_df)
+    venue_win_rate_team2 = get_venue_win_rate(team2, venue, venue_df)
+
+    # === Load Model ===
+    import joblib
+    model = joblib.load(r"C:\Users\aakas\Documents\cricket-data-engineering\ML\match_outcome_model.pkl")
+
+    # === Generate Feature Vector ===
+    features_df = pd.DataFrame([{
+        "team1_strength": team1_strength,
+        "team2_strength": team2_strength,
+        "venue_win_rate_team1": venue_win_rate_team1,
+        "venue_win_rate_team2": venue_win_rate_team2,
+        "toss_winner_bin": 1 if toss_winner == team1 else 0,
+        "toss_decision_bin": 1 if toss_decision == "field" else 0,
+        "recent_form_team1": recent_form_team1,
+        "recent_form_team2": recent_form_team2
+    }])
+
+    # === Optional: Display Feature Inputs for Debugging
+    st.write("🧬 Feature Inputs", features_df)
+
+    # === Predict Outcome ===
+    prediction = model.predict(features_df)[0]
+    probability = model.predict_proba(features_df)[0][1]
+
+    # === Display Results ===
+    st.metric(label=f"Win Probability for {team1}", value=f"{round(probability * 100, 2)}%")
