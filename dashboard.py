@@ -182,8 +182,12 @@ with tab7:
 
     # === Load Model ===
     import joblib
-    model = joblib.load(r"C:\Users\aakas\Documents\cricket-data-engineering\ML\match_outcome_model.pkl")
-
+    #model = joblib.load(r"C:\Users\aakas\Documents\cricket-data-engineering\ML\match_outcome_model.pkl")
+    try:
+        model = joblib.load("ML/match_outcome_model.pkl")
+    except FileNotFoundError:
+        st.error("❌ Model file not found. Please ensure match_outcome_model.pkl is present in the ML folder.")
+        st.stop()
     # === Generate Feature Vector ===
     features_df = pd.DataFrame([{
         "team1_strength": team1_strength,
@@ -204,4 +208,5 @@ with tab7:
     probability = model.predict_proba(features_df)[0][1]
 
     # === Display Results ===
+    #predicted_team = team1 if prediction == 1 else team2
     st.metric(label=f"Win Probability for {team1}", value=f"{round(probability * 100, 2)}%")
