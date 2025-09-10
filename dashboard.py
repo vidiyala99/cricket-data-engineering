@@ -118,12 +118,17 @@ with tab7:
     # === Load Match History and Venue Data ===
     from etl.data_cleaning import clean_matches, clean_venue_names
     from etl.venue_mapping import venue_map
+    from etl.team_mapping import team_map  # ✅ NEW: Team normalization
 
     matches_path = "data/raw/matches_extracted.csv"
     try:
         matches_df = pd.read_csv(matches_path)
         matches_df = clean_matches(matches_df)
+
         venue_df = clean_venue_names(venue_df)
+        venue_df["team"] = venue_df["team"].str.strip().map(lambda x: team_map.get(x, x))  # ✅ Normalize team names
+
+        basra_df["team"] = basra_df["team"].str.strip().map(lambda x: team_map.get(x, x))  # ✅ Normalize dropdown teams
 
         # === Detect Unmapped Venues (Debugging Aid) ===
         unmapped = venue_df[~venue_df["venue"].isin(set(venue_map.values()))]["venue"].unique()

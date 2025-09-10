@@ -1,6 +1,6 @@
 import pandas as pd
 from etl.venue_mapping import venue_map
-
+from etl.team_mapping import team_map
 def clean_venue_names(df):
     df["venue"] = df["venue"].str.strip()
     df["venue"] = df["venue"].map(lambda x: venue_map.get(x, x))
@@ -14,7 +14,7 @@ def clean_matches(df):
 
     # Strip whitespace from team-related columns
     for col in ["team1", "team2", "winner", "toss_winner"]:
-        df[col] = df[col].str.strip()
+        df[col] = df[col].str.strip().map(lambda x: team_map.get(x, x))
 
     # Convert date column to datetime
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
