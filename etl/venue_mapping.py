@@ -1,10 +1,11 @@
 venue_map = {
+    # Arun Jaitley Stadium
+    "Feroz Shah Kotla": "Arun Jaitley Stadium",
+    "Arun Jaitley Stadium, Delhi": "Arun Jaitley Stadium",
+
     # MA Chidambaram Stadium
     "MA Chidambaram Stadium, Chepauk": "MA Chidambaram Stadium",
     "MA Chidambaram Stadium, Chepauk, Chennai": "MA Chidambaram Stadium",
-
-    # Wankhede Stadium
-    "Wankhede Stadium, Mumbai": "Wankhede Stadium",
 
     # M Chinnaswamy Stadium
     "M.Chinnaswamy Stadium": "M Chinnaswamy Stadium",
@@ -13,13 +14,13 @@ venue_map = {
     # Eden Gardens
     "Eden Gardens, Kolkata": "Eden Gardens",
 
-    # Arun Jaitley Stadium
-    "Feroz Shah Kotla": "Arun Jaitley Stadium",
-    "Arun Jaitley Stadium, Delhi": "Arun Jaitley Stadium",
-
     # ACA-VDCA Stadium
     "Dr. Y.S. Rajasekhara Reddy ACA-VDCA Cricket Stadium": "ACA-VDCA Stadium",
     "Dr. Y.S. Rajasekhara Reddy ACA-VDCA Cricket Stadium, Visakhapatnam": "ACA-VDCA Stadium",
+
+    # DY Patil Stadium
+    "Dr DY Patil Sports Academy": "DY Patil Stadium",
+    "Dr DY Patil Sports Academy, Mumbai": "DY Patil Stadium",
 
     # IS Bindra Stadium
     "Punjab Cricket Association IS Bindra Stadium, Mohali": "IS Bindra Stadium",
@@ -27,21 +28,27 @@ venue_map = {
     "Punjab Cricket Association IS Bindra Stadium": "IS Bindra Stadium",
     "Punjab Cricket Association Stadium, Mohali": "IS Bindra Stadium",
 
-    # DY Patil Stadium
-    "Dr DY Patil Sports Academy, Mumbai": "DY Patil Stadium",
-    "Dr DY Patil Sports Academy": "DY Patil Stadium",
-
     # Rajiv Gandhi Stadium
     "Rajiv Gandhi International Stadium, Uppal": "Rajiv Gandhi International Stadium",
     "Rajiv Gandhi International Stadium, Uppal, Hyderabad": "Rajiv Gandhi International Stadium",
 
-    # Maharashtra Cricket Association Stadium
-    "Maharashtra Cricket Association Stadium, Pune": "Maharashtra Cricket Association Stadium",
+    # Wankhede Stadium
+    "Wankhede Stadium, Mumbai": "Wankhede Stadium",
 
-    # Sawai Mansingh Stadium
-    "Sawai Mansingh Stadium, Jaipur": "Sawai Mansingh Stadium",
+    # Brabourne Stadium
+    "Brabourne Stadium, Mumbai": "Brabourne Stadium",
 
-    # Himachal Pradesh Cricket Association Stadium
+    # Narendra Modi Stadium
+    "Sardar Patel Stadium, Motera": "Narendra Modi Stadium",
+    "Narendra Modi Stadium, Ahmedabad": "Narendra Modi Stadium",
+
+    # Ekana Stadium
+    "Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow": "Ekana Cricket Stadium",
+
+    # Barsapara Stadium
+    "Barsapara Cricket Stadium, Guwahati": "Barsapara Stadium",
+
+    # HPCA Stadium
     "Himachal Pradesh Cricket Association Stadium, Dharamsala": "HPCA Stadium",
     "Himachal Pradesh Cricket Association Stadium": "HPCA Stadium",
 
@@ -51,40 +58,34 @@ venue_map = {
     # Raipur Stadium
     "Shaheed Veer Narayan Singh International Stadium": "Raipur Stadium",
 
-    # Barabati Stadium
-    "Barabati Stadium": "Barabati Stadium",
-
     # Green Park
     "Green Park": "Green Park Stadium",
 
-    # Brabourne Stadium
-    "Brabourne Stadium, Mumbai": "Brabourne Stadium",
+    # Holkar Stadium
+    "Holkar Cricket Stadium": "Holkar Stadium",
 
-    # Narendra Modi Stadium
-    "Narendra Modi Stadium, Ahmedabad": "Narendra Modi Stadium",
+    # Maharashtra Stadium
+    "Maharashtra Cricket Association Stadium, Pune": "Maharashtra Cricket Association Stadium",
 
-    # Ekana Stadium
-    "Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow": "Ekana Cricket Stadium",
+    # Sawai Mansingh Stadium
+    "Sawai Mansingh Stadium, Jaipur": "Sawai Mansingh Stadium",
 
-    # Barsapara Stadium
-    "Barsapara Cricket Stadium, Guwahati": "Barsapara Stadium",
+    # VCA Stadium
+    "Vidarbha Cricket Association Stadium, Jamtha": "VCA Stadium",
 
     # Mullanpur Stadium
     "Maharaja Yadavindra Singh International Cricket Stadium, Mullanpur": "Mullanpur Stadium",
 
-    # Sardar Patel Stadium
-    "Sardar Patel Stadium, Motera": "Narendra Modi Stadium",
-
-    # Vidarbha Stadium
-    "Vidarbha Cricket Association Stadium, Jamtha": "VCA Stadium",
-
-    # Nehru Stadium
-    "Nehru Stadium": "Nehru Stadium",
-
     # Subrata Roy Sahara Stadium
     "Subrata Roy Sahara Stadium": "Sahara Stadium",
 
-    # South Africa venues
+    # UAE Venues
+    "Zayed Cricket Stadium, Abu Dhabi": "Zayed Cricket Stadium",
+    "Sheikh Zayed Stadium": "Zayed Cricket Stadium",
+    "Dubai International Cricket Stadium": "Dubai International Stadium",
+    "Sharjah Cricket Stadium": "Sharjah Cricket Stadium",
+
+    # South Africa Venues
     "Newlands": "Newlands",
     "St George's Park": "St George's Park",
     "Kingsmead": "Kingsmead",
@@ -94,9 +95,8 @@ venue_map = {
     "De Beers Diamond Oval": "Diamond Oval",
     "OUTsurance Oval": "OUTsurance Oval",
 
-    # UAE venues
-    "Sheikh Zayed Stadium": "Zayed Cricket Stadium",
-    "Zayed Cricket Stadium, Abu Dhabi": "Zayed Cricket Stadium",
-    "Dubai International Cricket Stadium": "Dubai International Stadium",
-    "Sharjah Cricket Stadium": "Sharjah Cricket Stadium"
+    # Others
+    "Barabati Stadium": "Barabati Stadium",
+    "Saurashtra Cricket Association Stadium": "Saurashtra Cricket Association Stadium",
+    "Nehru Stadium": "Nehru Stadium"
 }
