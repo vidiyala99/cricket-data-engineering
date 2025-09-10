@@ -112,22 +112,23 @@ with tab6:
     st.subheader("🎯 Batter Performance Against Team")
     render_df(batter_performance_against_team_df, "Batter_Performance_Against_Team")
 # === Match Outcome Prediction ===
-#tab7 = st.tabs(["🔮 Match Outcome Prediction"])[0]
-
-# === Match Outcome Prediction ===
-# === Match Outcome Prediction ===
 with tab7:
     st.subheader("🔮 Predict Match Outcome")
 
     # === Load Match History and Venue Data ===
-    from etl.data_cleaning import clean_matches
     from etl.data_cleaning import clean_matches, clean_venue_names
+    from etl.venue_mapping import venue_map
 
     matches_path = "data/raw/matches_extracted.csv"
     try:
-        matches_df = pd.read_csv(matches_path)                
+        matches_df = pd.read_csv(matches_path)
         matches_df = clean_matches(matches_df)
         venue_df = clean_venue_names(venue_df)
+
+        # === Detect Unmapped Venues (Debugging Aid) ===
+        unmapped = venue_df[~venue_df["venue"].isin(set(venue_map.values()))]["venue"].unique()
+        if len(unmapped) > 0:
+            st.warning(f"🕵️ Unmapped venues detected: {unmapped}")
     except Exception as e:
         st.error(f"❌ Failed to load or clean match data: {e}")
         st.stop()
@@ -182,12 +183,12 @@ with tab7:
 
     # === Load Model ===
     import joblib
-    #model = joblib.load(r"C:\Users\aakas\Documents\cricket-data-engineering\ML\match_outcome_model.pkl")
     try:
         model = joblib.load("ML/match_outcome_model.pkl")
     except FileNotFoundError:
         st.error("❌ Model file not found. Please ensure match_outcome_model.pkl is present in the ML folder.")
         st.stop()
+
     # === Generate Feature Vector ===
     features_df = pd.DataFrame([{
         "team1_strength": team1_strength,
@@ -206,7 +207,8 @@ with tab7:
     # === Predict Outcome ===
     prediction = model.predict(features_df)[0]
     probability = model.predict_proba(features_df)[0][1]
+    predicted_team = team1 if prediction == 1 else team2
 
     # === Display Results ===
-    #predicted_team = team1 if prediction == 1 else team2
     st.metric(label=f"Win Probability for {team1}", value=f"{round(probability * 100, 2)}%")
+    st.write(f"🔮 Predicted Winner: **{predicted_team}**")
