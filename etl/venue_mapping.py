@@ -100,3 +100,10 @@ venue_map = {
     "Saurashtra Cricket Association Stadium": "Saurashtra Cricket Association Stadium",
     "Nehru Stadium": "Nehru Stadium"
 }
+
+venue_map.update({
+    "Feroz Shah Kotla Ground": "Arun Jaitley Stadium",
+    "M. A. Chidambaram Stadium": "MA Chidambaram Stadium",
+    "Rajiv Gandhi Intl. Cricket Stadium": "Rajiv Gandhi International Stadium",
+    "M. Chinnaswamy Stadium": "M Chinnaswamy Stadium"
+})
