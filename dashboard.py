@@ -47,16 +47,16 @@ batter_performance_by_team_df = load_latest_csv("batter_performance_by_team")
 batter_performance_against_team_df = load_latest_csv("batter_performance_against_team")
 
 # === Tabs Layout ===
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
     "🏅 BASRA & Top Batters",
     "💀 Death Overs Analysis",
     "⚡ Powerplay Analysis",
     "📊 Team-Level Metrics",
     "🔁 All-Rounders & Raw Stats",
     "🎯 Performance Insights",
-    "🔮 Match Outcome Prediction"
+    "🔮 Match Outcome Prediction",
+    "📚 Match History & Summary"  # ✅ New tab
 ])
-
 # === Top Batters Tab ===
 with tab1:
     st.subheader("🔥 Top Batters by BASRA (with Team)")
@@ -217,3 +217,73 @@ with tab7:
     # === Display Results ===
     st.metric(label=f"Win Probability for {team1}", value=f"{round(probability * 100, 2)}%")
     st.write(f"🔮 Predicted Winner: **{predicted_team}**")
+
+with tab8:
+    st.subheader("📚 Match History & Summary")
+
+    # === Team Selection ===
+    col1, col2 = st.columns(2)
+    with col1:
+        team1 = st.selectbox("🏏 Team 1", options=teams, key="summary_team1")
+    with col2:
+        team2 = st.selectbox("🏏 Team 2", options=[t for t in teams if t != team1], key="summary_team2")
+
+    venue_filter = st.selectbox("📍 Filter by Venue (optional)", options=["All"] + venues)
+
+    # === Filter Matches ===
+    filtered_matches = matches_df[
+        ((matches_df["team1"] == team1) & (matches_df["team2"] == team2)) |
+        ((matches_df["team1"] == team2) & (matches_df["team2"] == team1))
+    ]
+
+    if venue_filter != "All":
+        filtered_matches = filtered_matches[filtered_matches["venue"] == venue_filter]
+
+    # === Head-to-Head Summary ===
+    total_matches = filtered_matches.shape[0]
+    team1_wins = filtered_matches[filtered_matches["winner"] == team1].shape[0]
+    team2_wins = filtered_matches[filtered_matches["winner"] == team2].shape[0]
+
+    st.markdown(f"**🆚 Head-to-Head Record ({total_matches} matches):**")
+    st.write(f"- {team1} wins: {team1_wins}")
+    st.write(f"- {team2} wins: {team2_wins}")
+    if total_matches > 0:
+        win_pct = round((team1_wins / total_matches) * 100, 2)
+        st.write(f"- {team1} win %: {win_pct}%")
+
+    # === Recent Form ===
+    def recent_form(team, df, n=5):
+        recent = df[
+            (df["team1"] == team) | (df["team2"] == team)
+        ].sort_values("date", ascending=False).head(n)
+        wins = recent[recent["winner"] == team].shape[0]
+        return wins
+
+    st.markdown("**📈 Recent Form (Last 5 Matches):**")
+    st.write(f"- {team1}: {recent_form(team1, matches_df)} wins")
+    st.write(f"- {team2}: {recent_form(team2, matches_df)} wins")
+
+    # === Venue Performance ===
+    def venue_win_rate(team, venue, venue_df):
+        row = venue_df[(venue_df["team"] == team) & (venue_df["venue"] == venue)]
+        if not row.empty and "win_percentage" in row.columns:
+            return round(row["win_percentage"].values[0], 2)
+        return None
+
+    if venue_filter != "All":
+        st.markdown(f"**🏟️ Venue Performance at {venue_filter}:**")
+        team1_rate = venue_win_rate(team1, venue_filter, venue_df)
+        team2_rate = venue_win_rate(team2, venue_filter, venue_df)
+        if team1_rate is not None:
+            st.write(f"- {team1}: {team1_rate}% win rate")
+        if team2_rate is not None:
+            st.write(f"- {team2}: {team2_rate}% win rate")
+
+    # === Last 3 Encounters ===
+    st.markdown("**🕰️ Last 3 Encounters:**")
+    last_3 = filtered_matches.sort_values("date", ascending=False).head(3)
+    if last_3.empty:
+        st.write("No match history available.")
+    else:
+        for _, row in last_3.iterrows():
+            st.write(f"- {row['date'].date()} at {row['venue']}: Winner - {row['winner']}")
