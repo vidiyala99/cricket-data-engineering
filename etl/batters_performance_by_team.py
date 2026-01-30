@@ -3,6 +3,7 @@ import pandas as pd
 from dotenv import load_dotenv
 import os
 from datetime import datetime
+from etl.db_utils import get_db_connection
 
 # Load environment variables
 load_dotenv()
@@ -15,13 +16,7 @@ DB_USER = os.getenv('DB_USER')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
 
 # Connect to PostgreSQL
-conn = psycopg2.connect(
-    host=DB_HOST,
-    port=DB_PORT,
-    database=DB_NAME,
-    user=DB_USER,
-    password=DB_PASSWORD
-)
+conn = get_db_connection()
 
 # Function to fetch batter performance against team
 def get_batter_performance_against_team():

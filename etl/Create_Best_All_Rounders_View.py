@@ -2,15 +2,10 @@ import psycopg2
 import pandas as pd
 import os
 from datetime import datetime
+from etl.db_utils import get_db_connection
 
 # Step 1: Connect to PostgreSQL
-conn = psycopg2.connect(
-    dbname="cricket_data",
-    user="postgres",
-    password="root1234",
-    host="localhost",
-    port="5432"
-)
+conn = get_db_connection()
 cursor = conn.cursor()
 
 # Step 2: Read and execute the SQL file to create the View

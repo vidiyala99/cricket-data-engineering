@@ -3,6 +3,7 @@ import psycopg2
 from psycopg2.extras import execute_batch
 from dotenv import load_dotenv
 import os
+from etl.db_utils import get_db_connection
 
 # Load environment variables from .env file
 load_dotenv()
@@ -16,13 +17,7 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 
 def load_csv_to_postgresql(csv_file, table_name):
     # Connect to PostgreSQL database
-    conn = psycopg2.connect(
-        host=DB_HOST,
-        port=DB_PORT,
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD
-    )
+    conn = get_db_connection()
     cur = conn.cursor()
 
     # Load CSV data into a DataFrame

@@ -1,17 +1,12 @@
 import pandas as pd
 import psycopg2
+from etl.db_utils import get_db_connection
 
 # Load CSV
 df = pd.read_csv("output/top_batters_multi_season.csv")
 
 # Connect to PostgreSQL
-conn = psycopg2.connect(
-    dbname="cricket_data",
-    user="postgres",
-    password="root1234",
-    host="localhost",
-    port="5432"
-)
+conn = get_db_connection()
 cursor = conn.cursor()
 
 # Create table if not exists

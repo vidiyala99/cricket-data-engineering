@@ -2,6 +2,7 @@ import psycopg2
 import pandas as pd
 import os
 from dotenv import load_dotenv
+from etl.db_utils import get_db_connection
 
 # Load environment variables from .env file
 load_dotenv()
@@ -21,13 +22,7 @@ def load_top_batters():
     cursor = None
     try:
         # Establish PostgreSQL connection
-        connection = psycopg2.connect(
-            host=DB_HOST,
-            port=DB_PORT,
-            dbname=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD
-        )
+        connection = get_db_connection()
         cursor = connection.cursor()
 
         # Check if the SQL file exists
@@ -70,4 +65,3 @@ def load_top_batters():
 
 if __name__ == "__main__":
     load_top_batters()
-

@@ -2,6 +2,7 @@ import pandas as pd
 import os
 from datetime import datetime
 import psycopg2
+from etl.db_utils import get_db_connection
 
 # Step 1: Generate timestamp (date + time for uniqueness)
 timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
@@ -67,13 +68,7 @@ print(saved_df.head(5))
 # -------------------------
 
 # Connect to PostgreSQL
-conn = psycopg2.connect(
-    dbname="cricket_data",
-    user="postgres",
-    password="root1234",
-    host="localhost",
-    port="5432"
-)
+conn = get_db_connection()
 cursor = conn.cursor()
 
 # Create table if not exists

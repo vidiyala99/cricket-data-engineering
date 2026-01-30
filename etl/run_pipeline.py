@@ -1,5 +1,9 @@
 import os
+import sys
 import subprocess
+
+# Ensure output directory exists before running any scripts
+os.makedirs("output", exist_ok=True)
 
 # List of ETL scripts to run (in order)
 etl_scripts = [
@@ -20,11 +24,24 @@ print("🔁 Running full ETL pipeline...\n")
 
 for script in etl_scripts:
     print(f"🚀 Running {script}...")
-    result = subprocess.run(["python", os.path.join("etl", script)], capture_output=True, text=True)
+    # Use sys.executable to ensure we use the same python environment
+    # Add project root to PYTHONPATH so imports like 'from etl.db_utils' work
+    env = os.environ.copy()
+    env["PYTHONPATH"] = os.getcwd() + os.pathsep + env.get("PYTHONPATH", "")
+    
+    result = subprocess.run(
+        [sys.executable, os.path.join("etl", script)],
+        capture_output=True,
+        text=True,
+        env=env
+    )
 
     if result.returncode == 0:
-        print(f"✅ {script} executed successfully!\n")
+        print(f"✅ {script} executed successfully!")
+        # Optional: Print stdout if needed, but keeping it clean
     else:
-        print(f"❌ Error running {script}:\n{result.stderr}\n")
+        print(f"❌ Error running {script}:")
+        print(result.stderr)
+        # Continuing to next script, but user should know
 
-print("🏁 All scripts attempted.")
+print("\n🏁 All scripts attempted.")

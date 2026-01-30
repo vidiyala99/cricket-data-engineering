@@ -1,15 +1,10 @@
 import pandas as pd
 import psycopg2
 import os
+from etl.db_utils import get_db_connection
 
 # Step 1: Connect to PostgreSQL
-conn = psycopg2.connect(
-    dbname="cricket_data",
-    user="postgres",
-    password="root1234",
-    host="localhost",
-    port="5432"
-)
+conn = get_db_connection()
 cursor = conn.cursor()
 
 # Step 2: Load deliveries.csv

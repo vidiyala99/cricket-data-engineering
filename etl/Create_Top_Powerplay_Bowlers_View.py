@@ -2,14 +2,9 @@ import psycopg2
 import pandas as pd
 import os
 from datetime import datetime
+from etl.db_utils import get_db_connection
 
-conn = psycopg2.connect(
-    dbname="cricket_data",
-    user="postgres",
-    password="root1234",
-    host="localhost",
-    port="5432"
-)
+conn = get_db_connection()
 cursor = conn.cursor()
 
 with open("sql/create_top_powerplay_bowlers_view.sql", "r") as f:

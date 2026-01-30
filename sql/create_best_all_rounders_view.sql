@@ -1,26 +1,30 @@
 CREATE OR REPLACE VIEW best_all_rounders_season AS
 WITH runs_per_season AS (
     SELECT
-        season,
-        batsman AS player,
-        SUM(runs_batsman) AS total_runs
+        m.season,
+        d.batsman AS player,
+        SUM(d.batsman_runs) AS total_runs
     FROM
-        deliveries_updated
+        deliveries d
+    JOIN
+        matches m ON d.match_id = m.id
     GROUP BY
-        season, batsman
+        m.season, d.batsman
 ),
 wickets_per_season AS (
     SELECT
-        season,
-        bowler AS player,
+        m.season,
+        d.bowler AS player,
         COUNT(*) AS total_wickets
     FROM
-        deliveries_updated
+        deliveries d
+    JOIN
+        matches m ON d.match_id = m.id
     WHERE
-        player_out IS NOT NULL
-        AND wicket_type IN ('bowled', 'caught', 'lbw', 'stumped', 'caught and bowled', 'hit wicket')
+        d.player_dismissed IS NOT NULL
+        AND d.dismissal_kind IN ('bowled', 'caught', 'lbw', 'stumped', 'caught and bowled', 'hit wicket')
     GROUP BY
-        season, bowler
+        m.season, d.bowler
 )
 SELECT
     r.season,

@@ -6,6 +6,7 @@ import os
 from sqlalchemy import create_engine
 from urllib.parse import quote
 import argparse
+from etl.db_utils import get_db_connection
 
 # -----------------------------
 # Load environment variables
@@ -56,13 +57,7 @@ with open("sql/generate_basra_leaderboard.sql", "r") as file:
 # -----------------------------
 # Step 2: Execute SQL and Fetch
 # -----------------------------
-conn = psycopg2.connect(
-    dbname=DB_NAME,
-    user=DB_USER,
-    password=DB_PASSWORD,
-    host=DB_HOST,
-    port=DB_PORT
-)
+conn = get_db_connection()
 cursor = conn.cursor()
 
 cursor.execute(sql_query)

@@ -3,6 +3,7 @@ import psycopg2
 from psycopg2 import sql
 import os
 from dotenv import load_dotenv
+from etl.db_utils import get_db_connection
 
 # Load environment variables
 load_dotenv()
@@ -15,13 +16,7 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 # PostgreSQL connection setup
 def connect_postgresql():
     try:
-        conn = psycopg2.connect(
-            host=DB_HOST,
-            port=DB_PORT,
-            dbname=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD
-        )
+        conn = get_db_connection()
         print("✅ Connected to PostgreSQL database successfully.")
         return conn
     except Exception as e:
@@ -91,4 +86,3 @@ print("✅ Data loaded successfully into 'deliveries_updated' table.")
 cur.close()
 conn.close()
 print("🔌 PostgreSQL connection closed.")
-

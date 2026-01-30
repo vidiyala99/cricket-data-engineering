@@ -1,13 +1,8 @@
 import pandas as pd
 import psycopg2
+from etl.db_utils import get_db_connection
 
-conn = psycopg2.connect(
-    dbname="cricket_data",
-    user="postgres",
-    password="root1234",
-    host="localhost",
-    port="5432"
-)
+conn = get_db_connection()
 cursor = conn.cursor()
 #query to create table in postgresql
 create_db_query="""CREATE TABLE IF NOT EXISTS top_batters_2016 (
